@@ -19,7 +19,7 @@ from telegram.ext import (
 BOT_TOKEN = "8994031713:AAEiPqhls2JZTrFmEEK-v5penqX0rsweSYk"
 
 DATA_FILES = [
-    "data/test_records_1.txt",
+    "Ahmedabad-547600_telegram.txt",
     "data/test_records_2.txt",
 ]
 
