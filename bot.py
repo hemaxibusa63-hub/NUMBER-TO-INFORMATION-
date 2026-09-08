@@ -16,13 +16,11 @@ from telegram.ext import (
 # CONFIG
 # ============================================================
 
-BOT_TOKEN = os.getenv("8994031713:AAH2RvYRjjmoO6xLk0F1AfJ2Fi40CHN8AMM", "PASTE_BOT_TOKEN_HERE")
-
-ALLOWED_GROUP_ID = -1003728200086
+BOT_TOKEN = "8994031713:AAEiPqhls2JZTrFmEEK-v5penqX0rsweSYk"
 
 DATA_FILES = [
-    "data/Ahmedabad-547600_telegram.txt",
-    "data/Ahmedabad-902900.txt",
+    "data/test_records_1.txt",
+    "data/test_records_2.txt",
 ]
 
 TITLE = "🛡️ KRUTIK CYBER EXPERT"
@@ -35,10 +33,9 @@ INDEX = defaultdict(list)
 # ============================================================
 
 def build_index():
-
     print()
     print("╔════════════════════════════════════╗")
-    print("║     🛡️ KRUTIK CYBER EXPERT        ║")
+    print("║          TEST LOOKUP BOT           ║")
     print("║        DATABASE INITIALIZER        ║")
     print("╚════════════════════════════════════╝")
     print()
@@ -46,7 +43,6 @@ def build_index():
     total_indexed = 0
 
     for data_file in DATA_FILES:
-
         print(f"📂 Loading: {data_file}")
 
         if not os.path.isfile(data_file):
@@ -61,7 +57,6 @@ def build_index():
                 errors="ignore",
                 buffering=1024 * 1024,
             ) as f:
-
                 content = f.read()
 
         except Exception as e:
@@ -76,7 +71,6 @@ def build_index():
         file_count = 0
 
         for record in records:
-
             record = record.strip()
 
             if not record:
@@ -104,7 +98,7 @@ def build_index():
 
     print()
     print("╔════════════════════════════════════╗")
-    print("║          ✅ INDEX READY            ║")
+    print("║            INDEX READY             ║")
     print("╠════════════════════════════════════╣")
     print(f"║ 📊 Records : {total_indexed:,}")
     print(f"║ 📱 Mobiles : {len(INDEX):,}")
@@ -114,42 +108,24 @@ def build_index():
 
 
 # ============================================================
-# GROUP ACCESS
-# ============================================================
-
-def allowed_group(update: Update) -> bool:
-
-    chat = update.effective_chat
-
-    if chat is None:
-        return False
-
-    return chat.id == ALLOWED_GROUP_ID
-
-
-# ============================================================
 # ANIMATION
 # ============================================================
 
 async def animate(message):
-
     frames = [
         "⚡ Initializing...",
         "🔐 Secure connection...",
-        "📡 Connecting database...",
+        "📡 Connecting test database...",
         "🔎 Searching test records...",
         "🧠 Matching number...",
         "⚙️ Processing result...",
     ]
 
     for frame in frames:
-
         try:
             await message.edit_text(
-                f"{TITLE}\n\n"
-                f"{frame}"
+                f"{TITLE}\n\n{frame}"
             )
-
             await asyncio.sleep(0.35)
 
         except Exception:
@@ -164,8 +140,7 @@ async def start(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-
-    if not allowed_group(update):
+    if not update.message:
         return
 
     await update.message.reply_text(
@@ -173,10 +148,10 @@ async def start(
         "╭────────────────────╮\n"
         "│  🚀 SYSTEM ONLINE  │\n"
         "╰────────────────────╯\n\n"
-        "🔐 Secure test lookup ready.\n\n"
-        "📱 Send a 10-digit mobile number.\n\n"
+        "🔐 Test lookup system ready.\n\n"
+        "📱 Send a 10-digit test number.\n\n"
         "Example:\n"
-        "➜ `9537640001`"
+        "➜ `1234567890`"
     )
 
 
@@ -188,8 +163,7 @@ async def status(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-
-    if not allowed_group(update):
+    if not update.message:
         return
 
     total = sum(
@@ -207,7 +181,7 @@ async def status(
         f"║ 📁 Files   : {len(DATA_FILES)}\n"
         "║ ⚡ Search  : READY\n"
         "╚══════════════════════════╝\n\n"
-        "🔐 Access: Private Group"
+        "🔐 Access: DM + Groups"
     )
 
 
@@ -219,10 +193,9 @@ async def show_id(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-
     chat = update.effective_chat
 
-    if chat is None:
+    if chat is None or not update.message:
         return
 
     await update.message.reply_text(
@@ -240,10 +213,6 @@ async def search(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
-
-    if not allowed_group(update):
-        return
-
     if not update.message:
         return
 
@@ -256,7 +225,6 @@ async def search(
     )
 
     if len(mobile) != 10:
-
         await update.message.reply_text(
             f"{TITLE}\n\n"
             "╭────────────────────╮\n"
@@ -264,10 +232,8 @@ async def search(
             "╰────────────────────╯\n\n"
             "📱 Please send exactly 10 digits."
         )
-
         return
 
-    # Temporary animation message
     loading = await update.message.reply_text(
         f"{TITLE}\n\n"
         "⚡ Initializing..."
@@ -275,46 +241,34 @@ async def search(
 
     await animate(loading)
 
-    # Search
     results = INDEX.get(
         mobile,
         []
     )
 
-    # No result
     if not results:
-
         await loading.edit_text(
             f"{TITLE}\n\n"
             "╔══════════════════════════╗\n"
             "║      ❌ NO MATCH        ║\n"
             "╚══════════════════════════╝\n\n"
-            f"📱 Mobile: `{mobile}`\n\n"
+            f"📱 Test Mobile: `{mobile}`\n\n"
             "🔎 No matching test record found."
         )
-
         return
-
-    # ========================================================
-    # RESULT
-    # ========================================================
 
     header = (
         f"{TITLE}\n\n"
         "╔══════════════════════════╗\n"
         "║      ✅ MATCH FOUND      ║\n"
         "╚══════════════════════════╝\n\n"
-        f"📱 Mobile: `{mobile}`\n"
+        f"📱 Test Mobile: `{mobile}`\n"
         f"📊 Total records: {len(results)}\n\n"
     )
 
     output = header
 
-    for number, record in enumerate(
-        results,
-        1
-    ):
-
+    for number, record in enumerate(results, 1):
         record = re.sub(
             r"Record\s+\d+",
             f"Record {number}",
@@ -331,17 +285,15 @@ async def search(
 
     output += (
         "━━━━━━━━━━━━━━━━━━━━\n"
-        "🛡️ KRUTIK CYBER EXPERT\n"
+        "🛡️ KRUTIK LOOKUP BOT\n"
         "⚡ SEARCH COMPLETE"
     )
 
-    # Remove loading message
     try:
         await loading.delete()
     except Exception:
         pass
 
-    # Telegram safe chunks
     MAX_LENGTH = 3900
 
     for start_pos in range(
@@ -349,7 +301,6 @@ async def search(
         len(output),
         MAX_LENGTH
     ):
-
         chunk = output[
             start_pos:start_pos + MAX_LENGTH
         ]
@@ -367,26 +318,23 @@ async def error_handler(
     update: object,
     context: ContextTypes.DEFAULT_TYPE
 ):
-
     print(
         "❌ ERROR:",
         context.error
     )
 
 
-# ======== ====================================================
+# ============================================================
 # MAIN
 # ============================================================
 
 def main():
 
-    if BOT_TOKEN == "PASTE_BOT_TOKEN_HERE":
-
+    if not BOT_TOKEN or BOT_TOKEN == "YOUR_BOT_TOKEN_HERE":
         raise RuntimeError(
-            "BOT_TOKEN set karo."
+            "BOT_TOKEN code mein set karo."
         )
 
-    # Load both test files
     build_index()
 
     app = (
@@ -396,29 +344,18 @@ def main():
         .build()
     )
 
-    # Commands
     app.add_handler(
-        CommandHandler(
-            "start",
-            start
-        )
+        CommandHandler("start", start)
     )
 
     app.add_handler(
-        CommandHandler(
-            "status",
-            status
-        )
+        CommandHandler("status", status)
     )
 
     app.add_handler(
-        CommandHandler(
-            "id",
-            show_id
-        )
+        CommandHandler("id", show_id)
     )
 
-    # Mobile search
     app.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,
@@ -433,7 +370,8 @@ def main():
     print()
     print("🛡️ KRUTIK CYBER EXPERT")
     print("🤖 BOT STARTED")
-    print(f"🔐 Allowed Group: {ALLOWED_GROUP_ID}")
+    print("👤 DM: ENABLED")
+    print("👥 GROUPS: ENABLED")
     print("⚡ Waiting for messages...")
     print()
 
